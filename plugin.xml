@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	
+	<extension
+       point="org.eclipse.ui.contexts">
+    	<context
+          	id="com.caveup.autosysed.editors.context"
+          	name="Autosys Context"
+          	description="Autosys context"
+          	parentId="org.eclipse.ui.contexts.window">
+    	</context>
+ 	</extension>
+ 
+	<extension
+		point="org.eclipse.ui.editors">
+      	<editor
+            name="Autosys Editor"
+            extensions="jil"
+            icon="icons/autosysed.png"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            class="com.caveup.autosysed.editors.AutosysEditor"
+            id="com.caveup.autosysed.editors.AutosysEditor">
+            <contentTypeBinding contentTypeId="com.caveup.autosysed.editors.jilfile"/>
+      	</editor>
+   	</extension>
+   	<extension
+         point="org.eclipse.core.contenttype.contentTypes">
+        <content-type
+              file-extensions="jil"
+              id="com.caveup.autosysed.editors.jilfile"
+              name="JILFile"
+              priority="high"> 
+     	</content-type>
+     	<file-association 
+            content-type="com.caveup.autosysed.editors.jilfile"
+            file-extensions="jil"> 
+      </file-association> 
+   	</extension>
+	
+	<extension
+         point="org.eclipse.ui.commands">
+      	<category
+            name="Autosys Category"
+            id="om.caveup.autosysed.command.category">
+      	</category>
+      	<command
+            name="QuickOutline Command"
+            categoryId="om.caveup.autosysed.command.category"
+            id="com.caveup.autosysed.command.quickoutlinecmd">
+      	</command>
+      	<command
+            name="Validate"
+            categoryId="om.caveup.autosysed.command.category"
+            id="com.caveup.autosysed.command.validatorCmd">
+      	</command>
+   	</extension>
+   
+	<extension
+         point="org.eclipse.ui.handlers">
+      	<handler
+            commandId="com.caveup.autosysed.command.quickoutlinecmd"
+            class="com.caveup.autosysed.command.QuickOutlineHandler">
+      	</handler>
+      	<handler
+            commandId="com.caveup.autosysed.command.validatorCmd"
+            class="com.caveup.autosysed.command.ValidateHandler">
+            <activeWhen>
+            	<reference
+                  	definitionId="com.caveup.autosysed.definition">
+            	</reference>
+         </activeWhen>
+      	</handler>
+   	</extension>
+	
+	<extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.caveup.autosysed.command.quickoutlinecmd"
+            contextId="com.caveup.autosysed.editors.context"
+            sequence="M1+O"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   	</extension>
+   	
+   	<extension
+   			point="org.eclipse.ui.menus">
+      	<menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+        <menu
+			label="Autosys"
+            mnemonic="A"
+            id="com.caveup.autosysed.menu">
+            <command
+            	commandId="com.caveup.autosysed.command.validatorCmd"
+                mnemonic="V"
+                id="com.caveup.autosysed.menu.validatorCmd">
+                	<visibleWhen>
+	                  	<reference
+	                    	definitionId="com.caveup.autosysed.definition">
+	                  	</reference>
+              	 	</visibleWhen>
+            </command>
+         </menu>
+      	</menuContribution>
+      	<menuContribution
+            	locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         	<toolbar
+               	id="com.caveup.autosysed.toolbar">
+            	<command
+                  	commandId="com.caveup.autosysed.command.validatorCmd"
+                  	icon="icons/validated.png"
+                  	tooltip="Autosys Validator"
+                  	id="com.caveup.autosysed.toolbar.validatorCmd">
+                  	<visibleWhen>
+	                	<reference
+	                    	definitionId="com.caveup.autosysed.definition">
+	                  	</reference>
+              	 	</visibleWhen>
+            	</command>
+            	<separator
+                  	name="additions"
+                  	visible="false">
+           		</separator>
+         	</toolbar>
+      	</menuContribution>
+   	</extension>
+    <extension
+          point="org.eclipse.core.expressions.definitions">
+       <definition
+             id="com.caveup.autosysed.definition">
+       		<with
+               	variable="activePartId">
+            	<equals
+                  	value="com.caveup.autosysed.editors.AutosysEditor">
+            	</equals>
+         	</with>
+       </definition>
+    </extension>
+</plugin>
