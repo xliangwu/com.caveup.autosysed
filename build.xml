@@ -108,9 +108,9 @@
 		<antcall target="gather.bin.parts">
 			<param name="destination.temp.folder" value="${temp.folder}/" />
 		</antcall>
-		<antcall target="gather.sources">
+		<!--antcall target="gather.sources">
 			<param name="destination.temp.folder" value="${temp.folder}/" />
-		</antcall>
+		</antcall-->
 		<antcall target="jar.folder" />
 	</target>
 	<target name="jar.folder">
