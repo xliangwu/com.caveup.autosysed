@@ -1,10 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Autosysed
+Bundle-Name: autosysed
+Bundle-ClassPath: .,
+ lib/dnsjava-2.1.1.jar
 Bundle-SymbolicName: com.caveup.autosysed;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0.v20130721
 Bundle-Activator: com.caveup.autosysed.Activator
-Bundle-Vendor: CAVEUP
+Bundle-Vendor: Caveup, Inc.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
@@ -13,5 +15,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: lib/dnsjava-2.1.1.jar,
- .
+Eclipse-LazyStart: true

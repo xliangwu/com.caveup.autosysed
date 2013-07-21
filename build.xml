@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="com.caveup.autosysed" default="export" basedir=".">
+
+	<property name="bootclasspath" value="" />
+	<property name="ws" value="win32" />
+	<property name="os" value="win32" />
+	<property name="arch" value="x86" />
+	<property name="build.workdir" value="plugin" />
+
+	<target name="init" depends="properties">
+		<property name="plugin" value="com.caveup.autosysed" />
+		<property name="version.suffix" value="_1.0.0.v20130721" />
+		<property name="full.name" value="${plugin}${version.suffix}" />
+		<property name="temp.folder" value="${build.workdir}/temp.folder" />
+		<property name="plugin.destination" value="${build.workdir}" />
+		<property name="build.result.folder" value="${build.workdir}" />
+	</target>
+
+	<target name="properties" if="eclipse.running">
+		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
+	</target>
+
+	<target name="build.update.jar" depends="init">
+		<delete dir="${temp.folder}" />
+		<mkdir dir="${temp.folder}" />
+		<antcall target="build.jars" />
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<zip zipfile="${plugin.destination}/${full.name}.jar" basedir="${temp.folder}/${full.name}" filesonly="false" update="no" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+	<target name="gather.bin.parts" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/${full.name}" />
+		<copy file="${build.result.folder}/autosysed.jar" todir="${destination.temp.folder}/${full.name}" />
+		<copy todir="${destination.temp.folder}/${full.name}">
+			<fileset dir="${basedir}" includes="plugin.xml,lib/*.jar,META-INF/*,*.txt,*.html,icons/*,plugin*.properties" />
+			<fileset dir="bin/" includes="**/*" />
+		</copy>
+	</target>
+
+	<target name="autosysed.jar" unless="autosysed.jar">
+		<property name="destdir" value="${temp.folder}/autosysed.jar.bin" />
+		<delete dir="${temp.folder}/autosysed.jar.bin" />
+		<mkdir dir="${temp.folder}/autosysed.jar.bin" />
+		<!-- compile the source code
+		<javac destdir="${temp.folder}/autosysed.jar.bin" failonerror="false" verbose="true" debug="on" includeAntRuntime="no" bootclasspath="${bootclasspath}" classpath="D:/java/eclipse/plugins/org.eclipse.jdt.ui_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.core.boot_2.1.0/boot.jar;D:/java/eclipse/plugins/org.eclipse.swt.win32_2.1.0/ws/${ws}/swt.jar;D:/java/eclipse/plugins/org.eclipse.core.resources.win32_2.1.0/resources.jar;D:/java/eclipse/plugins/org.eclipse.jface.text_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.core.resources_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.jface_2.1.0/jface.jar;D:/java/eclipse/plugins/org.eclipse.jface.text_2.1.0/jfacetext.jar;D:/java/eclipse/plugins/org.eclipse.ui.workbench.texteditor_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.jface_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.jdt.launching_2.1.0/launching.jar;D:/java/eclipse/plugins/org.eclipse.jdt.debug.ui_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.debug.ui_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.ui.editors_2.1.0/editors.jar;D:/java/eclipse/plugins/org.eclipse.ui.workbench.texteditor_2.1.0/texteditor.jar;D:/java/eclipse/plugins/org.eclipse.jdt.debug_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.ui.views_2.1.0/views.jar;D:/java/eclipse/plugins/org.eclipse.ui.win32_2.1.0/workbench.jar;D:/java/eclipse/plugins/org.eclipse.ui_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.core.boot_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.jdt.debug.ui_2.1.0/jdiui.jar;D:/java/eclipse/plugins/org.eclipse.core.runtime_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.jdt.core_2.1.0/jdtcore.jar;D:/java/eclipse/plugins/org.eclipse.jdt.core_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.core.runtime_2.1.0/runtime.jar;D:/java/eclipse/plugins/org.eclipse.text_2.1.0/text.jar;D:/java/eclipse/plugins/org.eclipse.jdt.debug_2.1.0/jdi.jar;D:/java/eclipse/plugins/org.eclipse.debug.core_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.ui_2.1.0/ui.jar;D:/java/eclipse/plugins/org.eclipse.core.resources_2.1.0/resources.jar;D:/java/eclipse/plugins/org.eclipse.swt_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.swt_2.1.0/ws/${ws}/swt.jar;D:/java/eclipse/plugins/org.eclipse.text_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.jdt.debug_2.1.0/jdimodel.jar;D:/java/eclipse/plugins/org.eclipse.jdt.debug_2.1.0/tools.jar;D:/java/eclipse/plugins/org.eclipse.ui.editors_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.ui.views_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.debug.ui_2.1.0/dtui.jar;D:/java/eclipse/plugins/org.eclipse.jdt.launching_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.ui.workbench_2.1.0/bin;D:/java/eclipse/plugins/org.eclipse.debug.core_2.1.0/dtcore.jar;D:/java/eclipse/plugins/org.eclipse.ui.workbench_2.1.0/workbench.jar;D:/java/eclipse/plugins/org.eclipse.jdt.ui_2.1.0/jdt.jar;D:/java/eclipse/plugins/org.eclipse.ui.win32_2.1.0/workbenchwin32.jar">
+			<src path="src/"/>
+		</javac>
+		-->
+		<!-- copy necessary resources -->
+		<copy todir="${temp.folder}/autosysed.jar.bin">
+			<fileset dir="bin/" includes="**/*" />
+		</copy>
+		<mkdir dir="${build.result.folder}" />
+		<jar jarfile="${build.result.folder}/autosysed.jar" basedir="${temp.folder}/autosysed.jar.bin" />
+		<delete dir="${temp.folder}/autosysed.jar.bin" />
+	</target>
+
+	<target name="autosysedsrc.zip" depends="init" unless="autosysedsrc.zip">
+		<mkdir dir="${build.result.folder}" />
+		<zip zipfile="${build.result.folder}/autosysedsrc.zip" filesonly="false" update="no">
+			<fileset dir="src/" includes="**/*.java" />
+			<fileset dir="${basedir}" excludes="**/bin/**/*.*,**/CVS" />
+		</zip>
+	</target>
+
+	<target name="build.jars">
+		<available property="autosysed.jar" file="${build.result.folder}/autosysed.jar" />
+		<antcall target="autosysed.jar" />
+	</target>
+
+	<target name="build.sources">
+		<available property="autosysedsrc.zip" file="${build.result.folder}/autosysedsrc.zip" />
+		<antcall target="autosysedsrc.zip" />
+	</target>
+
+	<target name="gather.sources" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/${full.name}" />
+		<copy file="${build.result.folder}/autosysedsrc.zip" todir="${destination.temp.folder}/${full.name}" />
+	</target>
+
+	<target name="gather.logs" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/${full.name}" />
+		<copy file="${temp.folder}/autosysed.jar.bin.log" todir="${destination.temp.folder}/${full.name}" />
+	</target>
+
+	<target name="clean" depends="init">
+		<delete file="${build.result.folder}/autosysed.jar" />
+		<delete file="${build.result.folder}/autosysedsrc.zip" />
+		<delete file="${plugin.destination}/${full.name}.jar" />
+		<delete file="${plugin.destination}/${full.name}.zip" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+	<target name="refresh" depends="init" if="eclipse.running">
+		<eclipse.refreshLocal resource="${plugin}" depth="infinite" />
+	</target>
+
+	<target name="export" depends="init">
+		<delete dir="${temp.folder}" />
+		<delete file="${build.result.folder}/autosysed.jar" />
+		<delete file="${build.result.folder}/autosysedsrc.zip" />
+		<mkdir dir="${temp.folder}" />
+		<antcall target="build.sources" />
+		<antcall target="build.jars" />
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<antcall target="gather.sources">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<antcall target="jar.folder" />
+	</target>
+	<target name="jar.folder">
+		<jar destfile="${plugin.destination}/${full.name}.jar" basedir="${temp.folder}/${full.name}" manifest="META-INF/MANIFEST.MF" filesonly="true" update="true" excludes="**/*.bin.log" />
+		<delete dir="${temp.folder}" />
+		<delete file="${build.result.folder}/autosysed.jar" />
+		<delete file="${build.result.folder}/autosysedsrc.zip" />
+	</target>
+</project>
