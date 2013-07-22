@@ -1,14 +1,11 @@
 package com.caveup.autosysed.utils;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.text.IDocument;
@@ -17,6 +14,7 @@ import org.eclipse.jface.viewers.TreeNode;
 
 import com.caveup.autosysed.domain.Job;
 import com.caveup.autosysed.domain.Job.JobType;
+import com.caveup.autosysed.editors.AutosysAttEnum;
 
 public final class JIlFileUtils {
 
@@ -38,35 +36,38 @@ public final class JIlFileUtils {
 				StringTokenizer token = new StringTokenizer(line, ": ");
 				while (token.hasMoreElements()) {
 					String key = token.nextToken().toLowerCase().trim();
-					if (key.equals("insert_job") || key.equals("delete_job") || key.equals("update_job")) {
+					if (AutosysAttEnum.INSERT_JOB.getContent().equals(key)
+							|| AutosysAttEnum.DELETE_JOB.getContent().equals(key)
+							|| AutosysAttEnum.UPDATE_JOB.getContent().equals(key)) {
 						String jobName = token.nextToken().trim();
 						// set the max offset
 						if (job != null)
 							job.setEndOffset(docuemnt.getLineOffset(i) - 1);
 
-						if (cacheJobMap.containsKey(jobName)) {
-							job = cacheJobMap.get(jobName);
-						} else {
-							job = new Job();
-							job.setJobName(jobName);
-						}
+						job = new Job();
+						job.setJobName(jobName);
+
 						int jobOffset = line.indexOf(job.getJobName());
 						job.setOffset(docuemnt.getLineOffset(i) + jobOffset);
 						job.setStartOffset(docuemnt.getLineOffset(i));
 						job.setLength(job.getJobName().length());
+						cacheJobMap.put(jobName, job);
 						allJobs.add(job);
-					} else if (key.equals("box_name")) {
+					} else if (AutosysAttEnum.BOX_NAME.getContent().equals(key)) {
 						job.setBoxName(token.nextToken());
-						if (!cacheJobMap.containsKey(job.getBoxName())) {
-							Job boxJob = new Job();
-							boxJob.setJobName(job.getBoxName());
-							cacheJobMap.put(job.getBoxName(), boxJob);
-						}
-					} else if (key.equals("job_type")) {
+					} else if (AutosysAttEnum.DATE_CONDITIONS.getContent().equals(key)) {
+						job.setDateCondition(token.nextToken());
+					} else if (AutosysAttEnum.START_TIMES.getContent().equals(key)) {
+						job.setStartTimes(token.nextToken());
+					} else if (AutosysAttEnum.START_MINS.getContent().equals(key)) {
+						job.setStartMins(token.nextToken());
+					} else if (AutosysAttEnum.DAYS_OF_WEEK.getContent().equals(key)) {
+						job.setDayOfWeeks(token.nextToken());
+					} else if (AutosysAttEnum.JOB_TYPE.getContent().equals(key)) {
 						String jobType = token.nextToken().toLowerCase().trim();
 						if (jobType.equals("b") || jobType.equals("box")) {
 							job.setJobType(JobType.BOX);
-						} else if (jobType.equals("f") || jobType.equals("file")) {
+						} else if (jobType.equals("f") || jobType.equals("fw")) {
 							job.setJobType(JobType.FILEWATCH);
 						} else {
 							job.setJobType(JobType.COMMAND);
@@ -79,16 +80,22 @@ public final class JIlFileUtils {
 		}
 
 		List<Job> res = new ArrayList<Job>();
+		Set<Job> existedJobSet = new HashSet<Job>();
 		for (Job job : allJobs) {
 			// root job
 			if (job.getBoxName() == null) {
 				res.add(job);
+				existedJobSet.add(job);
 			} else {
 				Job parentJob = cacheJobMap.get(job.getBoxName());
-				parentJob.addJob(job);
-				job.setParentJob(parentJob);
+				if (parentJob != null) {
+					parentJob.addJob(job);
+					job.setParentJob(parentJob);
+				} else {
+					res.add(job);
+					existedJobSet.add(job);
+				}
 			}
-			cacheJobMap.put(job.getJobName(), job);
 		}
 		return res;
 	}
@@ -106,78 +113,6 @@ public final class JIlFileUtils {
 		return nodes;
 	}
 
-	public static List<Job> parse(String file) {
-		List<Job> allJobs = new ArrayList<Job>();
-		Map<String, Job> cacheJobMap = new HashMap<String, Job>();
-		InputStream fis = null;
-		BufferedReader bufferedReader = null;
-		try {
-			Job job = null;
-
-			String line;
-			fis = new FileInputStream(file);
-			bufferedReader = new BufferedReader(new InputStreamReader(fis));
-			while ((line = bufferedReader.readLine()) != null) {
-				// skip the comment and space line
-				if (line.length() == 0)
-					continue;
-
-				if (line.startsWith("/*") || line.startsWith("//") || line.startsWith("*"))
-					continue;
-
-				StringTokenizer token = new StringTokenizer(line, ": ");
-				while (token.hasMoreElements()) {
-					String key = token.nextToken();
-					if (key.equals("insert_job") || key.equals("delete_job") || key.equals("update_job")) {
-						String jobName = token.nextToken();
-						if (cacheJobMap.containsKey(jobName)) {
-							job = cacheJobMap.get(jobName);
-						} else {
-							job = new Job();
-							job.setJobName(jobName);
-						}
-						int jobOffset = line.indexOf(job.getJobName());
-						job.setOffset(jobOffset);
-						job.setLength(job.getJobName().length());
-						allJobs.add(job);
-					} else if (key.equals("box_name")) {
-						job.setBoxName(token.nextToken());
-						if (!cacheJobMap.containsKey(job.getBoxName())) {
-							Job boxJob = new Job();
-							boxJob.setJobName(job.getBoxName());
-							cacheJobMap.put(job.getBoxName(), boxJob);
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (bufferedReader != null) {
-				try {
-					bufferedReader.close();
-					fis.close();
-				} catch (IOException e) {
-					// nothing to do
-				}
-			}
-		}
-
-		List<Job> res = new ArrayList<Job>();
-		for (Job job : allJobs) {
-			// root job
-			if (job.getBoxName() == null) {
-				res.add(job);
-			} else {
-				Job parentJob = cacheJobMap.get(job.getBoxName());
-				parentJob.addJob(job);
-				job.setParentJob(parentJob);
-			}
-			cacheJobMap.put(job.getJobName(), job);
-		}
-		return res;
-	}
-
 	public static void main(String[] args) {
 		String line = "insert_job:161534_IRIS_OTC_StopServer1     job_type:  c";
 		StringTokenizer token = new StringTokenizer(line, ": \t\n\r\f");
@@ -185,9 +120,6 @@ public final class JIlFileUtils {
 			String key = token.nextToken();
 			System.out.println(key);
 		}
-		List<Job> res = JIlFileUtils.parse("D:\\java\\runtime-EclipseApplication\\Test\\src\\prod.jil");
-		System.out.println(res.size());
-		TreeNode[] dp = buildTreeNode(res);
-		System.out.println(dp.length);
+
 	}
 }

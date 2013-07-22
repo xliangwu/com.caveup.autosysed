@@ -1,5 +1,6 @@
 package com.caveup.autosysed.editors;
 
+
 public enum AutosysAttEnum {
 	INSERT_JOB("insert_job"), 
 	DELETE_JOB("delete_job"), 
@@ -46,7 +47,7 @@ public enum AutosysAttEnum {
 	BOX_SUCCESS("box_success"),
 	BOX_FAILURE("box_failure"),
 	DATE_CONDITIONS("date_conditions");
-
+	
 	private String content;
 
 	/** content **/

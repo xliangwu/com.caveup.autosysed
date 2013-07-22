@@ -25,6 +25,11 @@ public class Job {
 	private String jobName;
 	private String boxName;
 	private String machine;
+	private String dateCondition;
+	private String startTimes;
+	private String startMins;
+	private String dayOfWeeks;
+
 	static {
 		imageMap.put(JobType.BOX, "/icons/box.png");
 		imageMap.put(JobType.CALENDAR, "/icons/calendar.gif");
@@ -177,5 +182,37 @@ public class Job {
 
 	public void setMachine(String machine) {
 		this.machine = machine;
+	}
+
+	public String getStartTimes() {
+		return startTimes;
+	}
+
+	public void setStartTimes(String startTimes) {
+		this.startTimes = startTimes;
+	}
+
+	public String getStartMins() {
+		return startMins;
+	}
+
+	public void setStartMins(String startMins) {
+		this.startMins = startMins;
+	}
+
+	public String getDayOfWeeks() {
+		return dayOfWeeks;
+	}
+
+	public void setDayOfWeeks(String dayOfWeeks) {
+		this.dayOfWeeks = dayOfWeeks;
+	}
+
+	public String getDateCondition() {
+		return dateCondition;
+	}
+
+	public void setDateCondition(String dateCondition) {
+		this.dateCondition = dateCondition;
 	}
 }
